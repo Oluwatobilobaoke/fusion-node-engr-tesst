@@ -57,18 +57,20 @@ Account.init({
       allowNull: true,
     },
 }, {
-  sequelize: sequelizeConnection
+  timestamps: true,
+  sequelize: sequelizeConnection,
+  paranoid: true
 })
 
 
 
-// Account.hasMany(Transaction, {
-//   as: "transactions"
-// })
+Account.hasMany(Transaction, {
+  as: "transactions"
+})
 
-// Transaction.belongsTo(Account, {
-//   foreignKey: "id",
-//   as: "transactions"
-// })
+Transaction.belongsTo(Account, {
+  foreignKey: "id",
+  as: "transactions"
+})
 
 export default Account

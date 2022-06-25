@@ -56,7 +56,9 @@ Beneficiary.init({
       allowNull: true,
     },
 }, {
+  timestamps: true,
   sequelize: sequelizeConnection,
+  paranoid: true
 })
 
 User.hasMany(Beneficiary, {

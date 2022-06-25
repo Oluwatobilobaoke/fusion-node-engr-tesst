@@ -50,12 +50,12 @@ User.init({
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: "email"
     },
     phone: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: "phone"
     },
     password: {
         type: DataTypes.STRING,
@@ -76,7 +76,9 @@ User.init({
       allowNull: true,
     },
 }, {
+  timestamps: true,
   sequelize: sequelizeConnection,
+  paranoid: true
 })
 
 User.hasOne(Account, {

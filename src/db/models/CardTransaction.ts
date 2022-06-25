@@ -40,12 +40,12 @@ CardTransaction.init({
     },
     external_reference: {
       type: DataTypes.STRING,
-      unique: true
+      unique: "external_reference"
     },
     account_id: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
-        unique: true
+        unique: "account_id"
     },
     amount: {
         type: DataTypes.DECIMAL(20, 4).UNSIGNED,
@@ -53,7 +53,7 @@ CardTransaction.init({
     },
     last_response: {
       type: DataTypes.STRING,
-      unique: true
+      unique: "last_response"
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -70,7 +70,9 @@ CardTransaction.init({
       allowNull: true,
     },
 }, {
-  sequelize: sequelizeConnection
+  timestamps: true,
+  sequelize: sequelizeConnection,
+  paranoid: true
 })
 
 

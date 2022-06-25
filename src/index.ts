@@ -1,4 +1,6 @@
 import express, { Application, Request, Response } from 'express'
+import chalk from 'chalk'
+
 
 // import routes from './api/routes'
 import dbInit from './db/init'
@@ -27,7 +29,7 @@ export const start = () => {
     const app = get()
     try {
         app.listen(port, () => {
-            console.log(`Server running on http://localhost:${port}`)
+            console.log(chalk.blue(`Server running on http://localhost:${port}`))
         })
     } catch (error: any) {
         console.log(`Error occurred: ${error.message}`)

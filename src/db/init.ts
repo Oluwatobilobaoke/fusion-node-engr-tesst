@@ -13,12 +13,12 @@ const isDev = process.env.NODE_ENV === 'development'
 // const isTest = process.env.NODE_ENV !== 'test'
 
 const dbInit = () => Promise.all([
-  User.sync({ alter: isDev }),
-  Account.sync({ alter: isDev }),
-  // Beneficiary.sync({ alter: isDev }),
-  // CardTransaction.sync({ alter: isDev  }),
-  // Transaction.sync({ alter: isDev }),
-  // VirtualAccount.sync({ alter: isDev }),
+  User.sync({ }),
+  Account.sync({  }),
+  Beneficiary.sync({ alter: isDev }),
+  CardTransaction.sync({ alter: isDev  }),
+  Transaction.sync({ alter: isDev }),
+  VirtualAccount.sync({ alter: isDev }),
 
 
   // User.sync({ alter: isDev || isTest }),

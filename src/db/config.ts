@@ -1,5 +1,6 @@
 require('dotenv').config()
 import diff from 'microdiff'
+import chalk from 'chalk'
 import { Dialect, Model, Sequelize } from 'sequelize'
 import { SequelizeHooks } from 'sequelize/types/lib/hooks'
 
@@ -53,8 +54,19 @@ const hooks: Partial<SequelizeHooks<Model<any, any>, any, any>> = {
 const sequelizeConnection = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
   dialect: dbDriver,
-  logging: true,
+  logging: false,
   define: {hooks}
 })
+
+const testDBConnect = async() => {
+  try {
+    await sequelizeConnection.authenticate();
+    console.log(chalk.bgGreen('Connection to Database has been established successfully.'));
+  } catch (error) {
+    console.error(chalk.bgRedBright('Unable to connect to the database:', error));
+  }
+};
+
+testDBConnect();
 
 export default sequelizeConnection

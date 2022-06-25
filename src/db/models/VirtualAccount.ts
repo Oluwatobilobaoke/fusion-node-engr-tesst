@@ -48,6 +48,7 @@ VirtualAccount.init({
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
+      unique: "id"
     },
     email: {
       type: DataTypes.STRING,
@@ -99,7 +100,9 @@ VirtualAccount.init({
       allowNull: true,
     },
 }, {
+  timestamps: true,
   sequelize: sequelizeConnection,
+  paranoid: true
 })
 
 VirtualAccount.belongsTo(User,{

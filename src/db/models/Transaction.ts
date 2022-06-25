@@ -80,7 +80,7 @@ Transaction.init({
     },
     reference: {
       type: DataTypes.STRING,
-      unique: true
+      unique: "reference"
     },
     balance_before: {
       type: DataTypes.DECIMAL(20, 4).UNSIGNED,
@@ -108,7 +108,9 @@ Transaction.init({
       allowNull: true,
     },
 }, {
+  timestamps: true,
   sequelize: sequelizeConnection,
+  paranoid: true
 })
 
 
