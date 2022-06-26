@@ -1,3 +1,4 @@
+import { Beneficiary as BeneficiaryInterface } from './../../api/interfaces/beneficiary.interface';
 import { DataTypes, Model, ModelStatic, Optional } from 'sequelize'
 import sequelizeConnection from '../config'
 import User from './User'
@@ -12,8 +13,11 @@ interface BeneficiaryAttributes {
 }
 
 export interface BeneficiaryInput extends Optional<BeneficiaryAttributes, 'id' > {}
-
-export interface BeneficiaryOutput extends Required<BeneficiaryAttributes> {}
+export interface BeneficiaryOutput {
+  success: boolean;
+  message?: string;
+  data: BeneficiaryInterface;
+}
 
 class Beneficiary extends Model<BeneficiaryAttributes, BeneficiaryInput> implements BeneficiaryAttributes {
     public id!: number
@@ -66,8 +70,7 @@ User.hasMany(Beneficiary, {
 })
 
 Beneficiary.belongsTo(User, {
-  foreignKey: "id",
-  as: "beneficiaries"
+  foreignKey: "user_id",
 })
 
 export default Beneficiary

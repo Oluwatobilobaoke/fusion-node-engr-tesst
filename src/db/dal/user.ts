@@ -1,71 +1,119 @@
-import {isEmpty} from 'lodash'
+import { isEmpty } from "lodash";
 
-
-import { User } from '../models'
-import { UserInput, UserOutput } from '../models/User'
-
+import { Account, User } from "../models";
+import { UserInput, UserOutput } from "../models/User";
 
 export const create = async (payload: UserInput): Promise<UserOutput> => {
-    const user =  await User.create(payload)
+  const user = await User.create(payload);
 
-    return user
-}
+  return {
+    success: true,
+    data: user,
+  };
+};
 
 export const findOrCreate = async (payload: UserInput): Promise<UserOutput> => {
   const [user] = await User.findOrCreate({
     where: {
-      email: payload.email
+      email: payload.email,
     },
-    defaults: payload
-  })
-}
+    defaults: payload,
+  });
 
-export const update = async (id: number, payload: Partial<UserInput>): Promise<UserOutput> => {
-  const user = await User.findByPk(id)
+  return {
+    success: true,
+    data: user,
+  };
+};
+
+export const update = async (
+  id: number,
+  payload: Partial<UserInput>
+): Promise<UserOutput> => {
+  const user = await User.findByPk(id);
 
   if (!user) {
-      // @todo throw custom error
-      throw new Error('not found')
+    return {
+      success: false,
+      message: "Account does not exist",
+      data: {}
+    }
   }
 
-  const updatedUser = await user.update(payload)
-  return updatedUser
-}
+  const updatedUser = await user.update(payload);
+  return {
+    success: true,
+    data: updatedUser,
+  };
+};
 
 export const getById = async (id: number): Promise<UserOutput> => {
-  const user = await User.findByPk(id)
+  const user = await User.findByPk(id);
+
+    if (!user) {
+      return {
+        success: false,
+        message: "Account does not exist",
+        data: {}
+      }
+    }
+
+  return {
+    success: true,
+    data: user,
+  };
+};
+
+export const getByEmail = async (email: string): Promise<UserOutput> => {
+  const user = await User.findOne({
+    where: { email: email },
+    include: [
+      {
+        model: Account,
+        attributes: ["id", "balance"],
+      },
+    ],
+  });
+
 
   if (!user) {
-      // @todo throw custom error
-      throw new Error('not found')
+    return {
+      success: false,
+      message: "Account does not exist",
+      data: {}
+    }
   }
 
-  return user
-}
+
+  return {
+    success: true,
+    data: user,
+  };
+};
 
 export const deleteById = async (id: number): Promise<boolean> => {
   const deletedUserCount = await User.destroy({
-      where: {id}
-  })
+    where: { id },
+  });
 
-  return !!deletedUserCount
-}
+  return !!deletedUserCount;
+};
 
 export const checkEmailExists = async (email: string): Promise<boolean> => {
   const userWithEmail = await User.findOne({
-      where: {
-          email
-      }
+    where: {
+      email,
+    },
   });
 
-  return !isEmpty(userWithEmail)
-}
+  return !isEmpty(userWithEmail);
+};
 export const checkPhoneExists = async (phone: string): Promise<boolean> => {
   const userWithPhone = await User.findOne({
-      where: {
-          phone
-      }
+    where: {
+      phone,
+    },
   });
 
-  return !isEmpty(userWithPhone)
-}
+  return !isEmpty(userWithPhone);
+};

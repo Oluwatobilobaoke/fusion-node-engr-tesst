@@ -1,38 +1,94 @@
-import * as userDal from '../dal/user'
-import { GetAllUsersFilters } from '../dal/types'
-import { UserInput, UserOutput } from '../models/User'
+import { createAccount } from './accountService';
+import bcrypt from "bcryptjs";
+import * as userDal from "../dal/user";
+import * as accountDal from "../dal/account";
+import * as virtualAccountsDal from "../dal/virtualAccounts";
+import { GetAllUsersFilters } from "../dal/types";
+import { UserInput, UserOutput } from "../models/User";
+import { LoginAttributes } from "../../api/controllers/user";
 
-export const create =async (payload: UserInput): Promise<UserOutput> => {
-
+export const create = async (payload: UserInput): Promise<UserOutput> => {
   // TODO
-  const emailInput = payload.email
-  const emailExists = await userDal.checkEmailExists(payload.email)
+  const emailInput = payload.email;
+  const emailExists = await userDal.checkEmailExists(payload.email);
 
-  payload.email = emailExists ? payload.email : emailInput
+  payload.email = emailExists ? payload.email : emailInput;
+
   // HASH PASSWORD
+  const hashedPassword = bcrypt.hashSync(
+    payload.password,
+    bcrypt.genSaltSync(10)
+  );
+  payload.password = hashedPassword;
 
-  return userDal.create(payload);
-}
-
-
-export const update =async (id: number, payload: Partial<UserInput>): Promise<UserOutput> => {
-
-  if (payload.email) {
-    const emailInput = payload.email
-
-    const emailExists = await userDal.checkEmailExists(payload.email)
-
-    payload.email = emailExists ? payload.email : emailInput
-
+  // EMAIL EXIST?
+  if (emailExists) {
+    return {
+      success: false,
+      message: "Account already exists",
+      data: {},
+    };
   }
 
-  return userDal.update(id, payload)
-}
+  const user = await userDal.create(payload);
+
+  // Create Account Record - needs user.id
+  if (user) {
+    await createAccount({
+      user_id: user.data.id || 0,
+      balance: 1000000,
+      UserId: user.data.id || 0,
+    });
+  }
+
+  // Create VA - user.id
+
+  return user;
+};
+
+export const login = async (payload: LoginAttributes): Promise<UserOutput> => {
+  const emailInput = payload.email;
+  const passwordInput = payload.password;
+
+  const userExist = await userDal.getByEmail(emailInput);
+  const dbPassword = userExist.data.password;
+  // Check if password matches
+  const isMatch = bcrypt.compareSync(passwordInput, dbPassword || "");
+
+  if (!isMatch) {
+    return {
+      success: false,
+      message: "Email/Password is incorrect",
+      data: {},
+    };
+  }
+
+  return {
+    success: true,
+    message: "Login Successful",
+    data: userExist.data,
+  };
+};
+
+export const update = async (
+  id: number,
+  payload: Partial<UserInput>
+): Promise<UserOutput> => {
+  if (payload.email) {
+    const emailInput = payload.email;
+
+    const emailExists = await userDal.checkEmailExists(payload.email);
+
+    payload.email = emailExists ? payload.email : emailInput;
+  }
+
+  return userDal.update(id, payload);
+};
 
 export const getById = (id: number): Promise<UserOutput> => {
-  return userDal.getById(id)
-}
+  return userDal.getById(id);
+};
 
 export const deleteById = (id: number): Promise<boolean> => {
-  return userDal.deleteById(id)
-}
+  return userDal.deleteById(id);
+};
