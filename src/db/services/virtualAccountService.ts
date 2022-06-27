@@ -4,11 +4,12 @@ import {
   VirtualAccountOutput,
 } from "../models/VirtualAccount";
 
+
+
+const PAYSTACK_BASE_URL = 'https://api.paystack.co';
 export const createVA = async (
   payload: VirtualAccountInput
 ): Promise<VirtualAccountOutput> => {
-  // Send request to Paystack here to create a new virtual account, save response in VA table
-
   return virtualAccountDal.create(payload);
 };
 

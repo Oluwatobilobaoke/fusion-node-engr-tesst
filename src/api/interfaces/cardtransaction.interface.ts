@@ -1,10 +1,10 @@
 export interface CardTransaction {
-  id: number
+  id?: number
   external_reference?: string
-  account_id: number
-  amount: number
+  account_id?: number
+  amount?: number
   last_response?: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
   deletedAt?: Date
 }

@@ -1,3 +1,4 @@
+import { CardTransaction as CardTransactionInterface } from './../../api/interfaces/cardtransaction.interface';
 import { DataTypes, Model, ModelStatic, Optional } from 'sequelize'
 import sequelizeConnection from '../config'
 
@@ -15,7 +16,11 @@ interface CardTransactionAttributes {
 
 export interface CardTransactionInput extends Optional<CardTransactionAttributes, 'id'| 'external_reference' | 'last_response' > {}
 
-export interface CardTransactionOutput extends Required<CardTransactionAttributes> {}
+export interface CardTransactionOutput {
+  success: boolean;
+  message?: string;
+  data: CardTransactionInterface;
+}
 
 class CardTransaction extends Model<CardTransactionAttributes, CardTransactionInput> implements CardTransactionAttributes {
     public id!: number
