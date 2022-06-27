@@ -1,8 +1,17 @@
 import { User } from './user.interface'
-// import { Recipe, RecipeMetadata } from './recipe.interface'
-// import { Review } from './review.interface'
-// import { RecipeTag } from './tag.inferace'
-
+import { Account } from './account.interface'
+import { Beneficiary } from './beneficiary.interface'
+import { CardTransaction } from './cardtransaction.interface'
+import { Transaction, Txn_Type, Purpose, TransactionMetadata } from './transaction.interface'
+import { VirtualAccount } from './virtualAccount.interface'
 export {
-  User
+  User,
+  Account,
+  Beneficiary,
+  Txn_Type,
+  Purpose,
+  TransactionMetadata,
+  CardTransaction,
+  Transaction,
+  VirtualAccount
 }

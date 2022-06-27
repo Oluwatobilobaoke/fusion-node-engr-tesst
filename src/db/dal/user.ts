@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash";
 
-import { Account, User } from "../models";
+import { Account, Beneficiary, User } from "../models";
 import { UserInput, UserOutput } from "../models/User";
 
 export const create = async (payload: UserInput): Promise<UserOutput> => {
@@ -72,6 +72,11 @@ export const getByEmail = async (email: string): Promise<UserOutput> => {
         model: Account,
         attributes: ["id", "balance"],
       },
+      {
+        model: Beneficiary,
+        attributes: ["id", "email"],
+        as: "beneficiaries"
+      }
     ],
   });
 

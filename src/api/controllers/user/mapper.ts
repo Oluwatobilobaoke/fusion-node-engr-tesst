@@ -4,6 +4,7 @@ export interface UserOptOutput extends UserOutput {}
 
 export const toUser = (data: UserOutput): UserOptOutput => {
   const user = data.data;
+  
   return {
     success: data.success,
     message: data.message,
@@ -14,6 +15,7 @@ export const toUser = (data: UserOutput): UserOptOutput => {
       email: user.email,
       phone: user.phone,
       Account: user.Account,
+      beneficiaries: user.beneficiaries,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       deletedAt: user.deletedAt,

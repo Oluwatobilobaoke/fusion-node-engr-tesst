@@ -8,7 +8,6 @@ import { UserInput, UserOutput } from "../models/User";
 import { LoginAttributes } from "../../api/controllers/user";
 
 export const create = async (payload: UserInput): Promise<UserOutput> => {
-  // TODO
   const emailInput = payload.email;
   const emailExists = await userDal.checkEmailExists(payload.email);
 
@@ -79,7 +78,13 @@ export const update = async (
 
     const emailExists = await userDal.checkEmailExists(payload.email);
 
-    payload.email = emailExists ? payload.email : emailInput;
+    if (!emailExists) {
+      return {
+        success: false,
+        message: "User is invalid",
+        data: {},
+      };
+    }
   }
 
   return userDal.update(id, payload);

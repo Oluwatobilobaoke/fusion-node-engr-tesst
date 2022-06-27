@@ -10,6 +10,7 @@ export const checkAccountExists = async (id: number): Promise<boolean> => {
 
   return !isEmpty(account);
 };
+
 export const create = async (payload: AccountInput): Promise<AccountOutput> => {
   const account = await Account.create(payload);
 

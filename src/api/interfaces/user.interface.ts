@@ -9,4 +9,5 @@ export interface User {
   updatedAt?: Date;
   deletedAt?: Date;
   Account?: Object;
+  beneficiaries?: Object
 }
