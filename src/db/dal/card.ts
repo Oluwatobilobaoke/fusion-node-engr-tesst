@@ -48,3 +48,12 @@ export const getById = async (id: number): Promise<CardTransactionOutput> => {
     data: cardTransaction,
   };
 };
+
+export const updateReference = async (external_reference: string) => {
+  
+  await CardTransaction.update(
+    { last_response: 'success' }, 
+    { where: 
+      { external_reference: external_reference } 
+    })
+}

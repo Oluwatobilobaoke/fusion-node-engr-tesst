@@ -1,18 +1,17 @@
 import { DataTypes, Model, ModelStatic, Optional } from 'sequelize'
 import sequelizeConnection from '../config'
-import Account from './Account'
-
+import { Transaction as TransactionInterface } from '../../api/interfaces'
 
 enum Txn_Type {
-  "debit",
-  "credit"
+  debit = "debit",
+  credit = "credit"
 }
 
-enum Purpose {
-  "deposit",
-  "transfer",
-  "reversal"
-}
+// export enum Purpose {
+//   depoist = "deposit",
+//   transfer = "transfer",
+//   reversal = "reversal"
+// }
 
 interface TransactionMetadata {
   info: string | null
@@ -20,13 +19,13 @@ interface TransactionMetadata {
 
 interface TransactionAttributes {
   id: number
-  txn_type: Txn_Type
-  purpose: Purpose
+  txn_type?: Txn_Type
+  purpose?: string
   amount: number
   account_id: number
   reference: string
-  balance_before: number
-  balance_after: number
+  balance_before?: number
+  balance_after?: number
   metadata: TransactionMetadata | null
   createdAt?: Date
   updatedAt?: Date
@@ -35,12 +34,16 @@ interface TransactionAttributes {
 
 export interface TransactionInput extends Optional<TransactionAttributes, 'id' > {}
 
-export interface TransactionOutput extends Required<TransactionAttributes> {}
+export interface TransactionOutput {
+  success: boolean;
+  message?: string;
+  data: TransactionInterface
+}
 
 class Transaction extends Model<TransactionAttributes, TransactionInput> implements TransactionAttributes {
     public id!: number
     public txn_type!: Txn_Type
-    public purpose!: Purpose
+    public purpose!: string
     public amount!: number
     public account_id!: number
     public reference!: string
@@ -80,7 +83,6 @@ Transaction.init({
     },
     reference: {
       type: DataTypes.STRING,
-      unique: "reference"
     },
     balance_before: {
       type: DataTypes.DECIMAL(20, 4).UNSIGNED,

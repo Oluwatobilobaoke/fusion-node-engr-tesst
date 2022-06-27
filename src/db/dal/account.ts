@@ -5,13 +5,15 @@ import { Account, Transaction } from "../models";
 import { AccountInput, AccountOutput } from "../models/Account";
 
 
+
+
 export const checkAccountExists = async (id: number): Promise<boolean> => {
   const account = await Account.findByPk(id)
 
   return !isEmpty(account);
 };
 
-export const create = async (payload: AccountInput): Promise<AccountOutput> => {
+export const create = async (payload: AccountInput, ): Promise<AccountOutput> => {
   const account = await Account.create(payload);
 
   return {
@@ -28,8 +30,11 @@ export const update = async (
   const account = await Account.findByPk(id);
 
   if (!account) {
-    // @todo throw custom error
-    throw new Error("not found");
+    return {
+      success: false,
+      message: "Account does not exist",
+      data: {}
+    }
   }
 
   const updatedAccount = await account.update(payload);
@@ -85,7 +90,6 @@ export const getById = async (id: number): Promise<AccountOutput> => {
   const account = await Account.findByPk(id);
 
   if (!account) {
-    // @todo throw custom error
     return {
       success: false,
       message: "Account does not exist",
@@ -105,14 +109,18 @@ export const getByUserID = async (id: number): Promise<AccountOutput> => {
     include: [
       {
         model: Transaction,
+        as: "transactions"
         // attributes: ["id", "balance"],
       },
     ],
   });
 
   if (!account) {
-    // @todo throw custom error
-    throw new Error("not found");
+    return {
+      success: false,
+      message: "User does not exist",
+      data: {}
+    }
   }
 
   return {

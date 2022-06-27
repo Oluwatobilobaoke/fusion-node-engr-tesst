@@ -1,7 +1,7 @@
 export interface Transaction {
   id?: number
   txn_type?: Txn_Type
-  purpose?: Purpose
+  purpose?: string
   amount?: number
   account_id?: number
   reference?: string
@@ -14,15 +14,11 @@ export interface Transaction {
 }
 
 export enum Txn_Type {
-  "debit",
-  "credit"
+  debit = "debit",
+  credit = "credit"
 }
 
-export enum Purpose {
-  "deposit",
-  "transfer",
-  "reversal"
-}
+
 
 export interface TransactionMetadata {
   info: string | null

@@ -4,6 +4,8 @@ import chalk from "chalk";
 import routes from "./api/routes";
 import dbInit from "./db/init";
 
+
+
 dbInit();
 
 const port = 5011;

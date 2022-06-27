@@ -1,4 +1,3 @@
-import { createCustomer, createVA } from './paystackService';
 import { createAccount } from './accountService';
 import bcrypt from "bcryptjs";
 import * as userDal from "../dal/user";
@@ -41,30 +40,32 @@ export const create = async (payload: UserInput): Promise<UserOutput> => {
       UserId: user.data.id || 0,
     });
 
-    const customerCreated = await createCustomer({
-      email: String(userObj.email),
-      first_name: String(userObj.firstName),
-      last_name: String(userObj.lastName),
-      phone: String(userObj.phone),
-    })
 
-    console.log("customerCreated");
-    console.log(customerCreated.data.data);
-    console.log("customerCreated");
-    const  customerCreatedObj = customerCreated.data.data
-      // Create VA - user.id
-      const customerVaCreated = await createVA({
-        customer: customerCreatedObj.customer_code
-      })
+    // // create virtual account
+    // const customerCreated = await createCustomer({
+    //   email: String(userObj.email),
+    //   first_name: String(userObj.firstName),
+    //   last_name: String(userObj.lastName),
+    //   phone: String(userObj.phone),
+    // })
 
-      console.log("customerVaCreated");
-      console.log(customerVaCreated.data);
-      console.log("customerVaCreated");
+    // console.log("customerCreated");
+    // console.log(customerCreated.data.data);
+    // console.log("customerCreated");
+    // const  customerCreatedObj = customerCreated.data.data
+    //   // Create VA - user.id
+    //   const customerVaCreated = await createVA({
+    //     customer: customerCreatedObj.customer_code
+    //   })
 
-      // TODO i stoppped here
+    //   console.log("customerVaCreated");
+    //   console.log(customerVaCreated.data);
+    //   console.log("customerVaCreated");
+
+    //   // TODO i stoppped here
 
 
-      // after getting this data call crreate va from va sevice
+    //   // after getting this data call crreate va from va sevice
 
   }
 
