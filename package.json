@@ -4,10 +4,13 @@
   "description": "Fintech Node.js Application with Typescript",
   "main": "dist/index.js",
   "scripts": {
+    "prestart": "npm run build",
+    "start": "node dist/src/index.js",
     "dev": "nodemon src/index.ts",
     "build": "npx tsc",
     "test": "jest --coverage --detectOpenHandles",
-    "watch-test": "npm run test -- --watchAll"
+    "watch-test": "npm run test -- --watchAll",
+    "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "keywords": [
     "sequelize",
