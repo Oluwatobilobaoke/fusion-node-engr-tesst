@@ -48,7 +48,19 @@ export const update = async (
 };
 
 export const getById = async (id: number): Promise<UserOutput> => {
-  const user = await User.findByPk(id);
+  const user = await User.findByPk(id, {
+    include: [
+      {
+        model: Account,
+        attributes: ["id", "balance"],
+      },
+      {
+        model: Beneficiary,
+        attributes: ["id", "email"],
+        as: "beneficiaries"
+      }
+    ],
+  });
 
     if (!user) {
       return {

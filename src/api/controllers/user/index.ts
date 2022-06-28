@@ -1,4 +1,4 @@
-import * as service from "../../../db/services/userService"; for war again
+import * as service from "../../../db/services/userService";
 import * as mapper from "./mapper";
 import { UserInput } from "../../../db/models/User";
 

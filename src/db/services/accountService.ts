@@ -42,10 +42,7 @@ export const transfer = async (
   amount: number
 ): Promise<TransactionOutput> => {
   const checkSenderExists = await userDal.getById(sender_id);
-
   const checkRecipientExists = await userDal.getByEmail(recipient_id);
-
-  console.log({ checkRecipientExists });
 
   if (
     checkSenderExists.success === false ||
@@ -57,6 +54,20 @@ export const transfer = async (
       data: {},
     };
   }
+
+  const checkUserBalance  = await accountDal.getByUserID(sender_id);
+
+  console.log(checkUserBalance.data.balance);
+
+  const userBal = checkUserBalance.data.balance;
+  if (Number(userBal) <= amount) {
+    return {
+      success: false,
+      message: "Insufficient funds, Alaye Fund your account",
+      data: {},
+    }
+  }
+  
 
   const checkRecipientIsBen = await checkUserIsBeneficiary(
     sender_id,
