@@ -28,3 +28,7 @@ https://documenter.getpostman.com/view/8996154/UzBtnirY
 
 4. Start the app 
     `npm dev`
+
+
+# Test
+![Test Coverage](https://res.cloudinary.com/oluwatobiloba/image/upload/v1656457859/Screen_Shot_2022-06-28_at_23.43.02_h0kxiz.png)
