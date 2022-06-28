@@ -57,7 +57,6 @@ export const transfer = async (
 
   const checkUserBalance  = await accountDal.getByUserID(sender_id);
 
-  console.log(checkUserBalance.data.balance);
 
   const userBal = checkUserBalance.data.balance;
   if (Number(userBal) <= amount) {
