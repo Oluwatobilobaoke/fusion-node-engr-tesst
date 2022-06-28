@@ -78,7 +78,13 @@ export const login = async (payload: LoginAttributes): Promise<UserOutput> => {
   const emailInput = payload.email;
   const passwordInput = payload.password;
 
+
+
   const userExist = await userDal.getByEmail(emailInput);
+
+  if (userExist.success === false) {
+    return userExist
+  }
   const dbPassword = userExist.data.password;
   // Check if password matches
   const isMatch = bcrypt.compareSync(passwordInput, dbPassword || "");

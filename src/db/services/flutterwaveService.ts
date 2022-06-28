@@ -3,82 +3,53 @@ require("dotenv").config();
 import { create } from "./../dal/card";
 import axios from "axios";
 import { updateReference } from "../dal/card";
-import { Response, Request } from "express";
+import * as transactionDal from "../dal/transaction";
+import * as accountDal from "../dal/account";
+import { creditAccount } from "./transactionService";
+import { Txn_Type } from "../../api/interfaces";
+import sequelizeConnection from "../config";
+import _ from "lodash";
 
 const FLW_BASE_URL = process.env.FLW_BASE_URL;
 
-// function processInitialCardCharge(chargeResult: any) {
-//   if (chargeResult.data.status === 'success') {
-//     return {
-//       success: true,
-//       status: chargeResult.data.status,
-//       message: chargeResult.data.message,
-//       data: {
-//         shouldCreditAccount: true,
-//         reference: chargeResult.data.reference,
-//       },
-//     };
-//   }
-
-//   return {
-//     success: true,
-//     status: chargeResult.data.status,
-//     message: chargeResult.data.message,
-//     data: {
-//       shouldCreditAccount: false,
-//       reference: chargeResult.data.reference,
-//     },
-//   };
-// }
-
-export interface payloadToEncrypt {
-  card_number: string;
-  cvv: string;
-  expiry_month: string;
-  expiry_year: string;
+export interface Payload {
+  account_id: number;
+  fullname: string;
   currency: string;
   amount: string;
   email: string;
-  fullname: string;
+  tx_ref?: string;
+  redirect_url?: string;
+}
+
+export interface VerifyPayload {
+  status: string;
   tx_ref: string;
+  transaction_id: string;
 }
 
-function encrypt(encryptionKey: any, payload: payloadToEncrypt) {
-  const text = JSON.stringify(payload);
-  const forge = require("node-forge");
-  const cipher = forge.cipher.createCipher(
-    "3DES-ECB",
-    forge.util.createBuffer(encryptionKey)
-  );
-  cipher.start({ iv: "" });
-  cipher.update(forge.util.createBuffer(text, "utf-8"));
-  cipher.finish();
-  const encrypted = cipher.output;
-  return forge.util.encode64(encrypted.getBytes());
-}
-
-// Initiate payment
-export const chargeCard = async (payload: payloadToEncrypt, res: Response) => {
+// payments
+export const generatePaymentLink = async (payload: Payload) => {
   try {
-    const encryptionObj = {
-      card_number: payload.card_number,
-      cvv: payload.cvv,
-      expiry_month: payload.expiry_month,
-      expiry_year: payload.expiry_year,
+    const paymentObject = {
       currency: payload.currency,
       amount: payload.amount,
       email: payload.email,
-      fullname: payload.fullname,
-      tx_ref: "txn-ydm-" + Date.now(),
+      redirect_url: payload.redirect_url,
+      tx_ref: "Txn-ydm-" + Date.now(),
+      customer: {
+        email: payload.email,
+        name: payload.fullname,
+        phone_number: payload.account_id,
+      },
+      meta: {
+        account_id: payload.account_id,
+      },
     };
 
     const { data } = await axios.post(
-      `${FLW_BASE_URL}/charges?type=card`,
-      encryptionObj,
-      // {
-      //   client: encrypt(process.env.FLW_ENC_KEY, encryptionObj),
-
-      // },
+      `${FLW_BASE_URL}/payments`,
+      paymentObject,
       {
         headers: {
           Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
@@ -87,152 +58,32 @@ export const chargeCard = async (payload: payloadToEncrypt, res: Response) => {
       }
     );
 
-
-    console.log(data);
-
-    //  After charging card check for mode in response
-    // switch (response?.meta?.authorization?.mode) {
-    //   case "pin":
-    //   case "avs_noauth":
-    //     const charge_payload = payload;
-    //     const auth_fields = response.meta.authorization.fields;
-    //     const auth_mode = response.meta.authorization.mode;
-
-    //     let options = {
-    //       maxAge: 1000 * 60 * 15, // would expire after 15 minutes
-    //       httpOnly: true, // The cookie only accessible by the web server
-    //       signed: true, // Indicates if the cookie should be signed
-    //     };
-
-    //     res.cookie("charge_payload", JSON.stringify(charge_payload), options);
-    //     res.cookie("auth_fields", JSON.stringify(auth_fields), options);
-    //     res.cookie("auth_mode", JSON.stringify(auth_mode), options);
-
-    //     return {
-    //       status: true,
-    //       message: "Charge Initiated",
-    //       data: {},
-    //     };
-
-    //     return;
-
-    //   case "redirect":
-    //     const authUrl = response.meta.authorization.redirect;
-    //     return {
-    //       status: true,
-    //       message: "Charge Initiated",
-    //       data: {
-    //         id: response.id,
-    //         authorization_url: authUrl,
-    //       },
-    //     };
-    //     return;
-
-    //   default:
-    //     // No authorization needed; just verify the payment
-    //     const transactionId = response.data.id;
-    //     const transaction = await axios.get(
-    //       `${FLW_BASE_URL}/transactions/${transactionId}/verify`,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-    //           "Content-Type": "application/json",
-    //         },
-    //       }
-    //     );
-
-    //     if (transaction.data.status == "successful") {
-    //       return {
-    //         status: true,
-    //         message: "Charge Initiated",
-    //         data: {
-    //           id: transaction.data.id,
-    //           tx_ref: transaction.data.tx_ref,
-    //           amount: transaction.data.amount,
-    //         },
-    //       };
-    //     } else {
-    //       return {
-    //         status: false,
-    //         message: "Charge failed",
-    //         data: {},
-    //       };
-    //     }
-    // }
-  } catch (error: any) {
+    if (data.status === "success") {
+      return {
+        status: true,
+        message: data.message,
+        data: data.data,
+      };
+    }
     return {
       status: false,
-      message: error?.message,
-      error,
+      message: "Something went wrong",
+      data: {},
     };
+  } catch (error) {
+    console.log(error);
   }
 };
 
-export const authorizeCharge = async (req: Request, res: Response) => {
-  const { charge_payload, auth_fields, auth_mode } = req.cookies;
+// payment verification
+export const verifyPayment = async (payload: VerifyPayload) => {
+  try {
+    const { tx_ref, transaction_id, status } = payload;
+    if (status === "successful") {
+      const transactionDetails = await transactionDal.getByRef(tx_ref);
 
-  const payload = JSON.parse(charge_payload);
-
-  payload.authorization = {
-    mode: JSON.parse(auth_mode),
-  };
-
-  const fields = JSON.parse(auth_fields);
-  fields.forEach((field: any) => {
-    payload.authorization.field = req.body[field];
-  });
-
-  const cardCharge = await axios.post(
-    `${FLW_BASE_URL}/charges?type=card`,
-    {
-      client: encrypt(process.env.FLW_ENC_KEY, payload),
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  const response = await cardCharge.data;
-
-  //  After charging card check for mode in response
-  switch (response?.meta?.authorization?.mode) {
-    case "otp":
-      const flw_ref = response.data.flw_ref;
-
-      let options = {
-        maxAge: 1000 * 60 * 15, // would expire after 15 minutes
-        httpOnly: true, // The cookie only accessible by the web server
-        signed: true, // Indicates if the cookie should be signed
-      };
-
-      res.cookie("flw_ref", flw_ref, options);
-
-      return {
-        status: true,
-        message: "Authorizing Charge",
-        data: {},
-      };
-
-      return;
-
-    case "redirect":
-      const authUrl = response.meta.authorization.redirect;
-      return {
-        status: true,
-        message: "Redirecting to authorization url",
-        data: {
-          authorization_url: authUrl,
-        },
-      };
-
-    default:
-      // No authorization needed; just verify the payment
-      const transactionId = response.data.id;
-      const transaction = await axios.get(
-        `${FLW_BASE_URL}/transactions/${transactionId}/verify`,
+      const { data } = await axios.get(
+        `${FLW_BASE_URL}/transactions/${transaction_id}/verify`,
         {
           headers: {
             Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
@@ -241,73 +92,111 @@ export const authorizeCharge = async (req: Request, res: Response) => {
         }
       );
 
-      if (transaction.data.status == "successful") {
+      const id = Number(data.data.meta.account_id);
+
+      const t = await sequelizeConnection.transaction();
+
+      if (data.data.status === "successful") {
+        // Success! Confirm the customer's payment
+        await creditAccount(
+          {
+            amount: data.data.amount_settled,
+            account_id: Number(id),
+            txn_type: Txn_Type.credit,
+            purpose: "deposit",
+            reference: tx_ref,
+            metadata: { info: JSON.stringify(data) },
+          },
+          t
+        );
+
         return {
           status: true,
-          message: "Charge successful",
+          message: `Transfer successful`,
           data: {
-            id: transaction.data.id,
-            tx_ref: transaction.data.tx_ref,
-            amount: transaction.data.amount,
+            tx_ref: data.data.tx_ref,
+            flw_ref: data.data.flw_ref,
           },
         };
       } else {
+        // Inform the customer their payment was unsuccessful
+        const accData = await accountDal.getById(id);
+
+        transactionDal.create({
+          txn_type: Txn_Type.credit,
+          purpose: "deposit",
+          amount: Number(transactionDetails.data.amount),
+          account_id: Number(id),
+          reference: tx_ref,
+          metadata: { info: "Transaction Failed" },
+          balance_before: Number(accData.data.balance),
+          balance_after: Number(accData.data.balance),
+        });
+
         return {
           status: false,
-          message: "Charge failed",
-          data: {},
+          message: "Transaction Failed",
         };
       }
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: "Something went wrong",
+      data: error,
+    };
   }
 };
 
-export const validateCharge = async (req: Request, res: Response) => {
-  const { flw_ref } = req.cookies;
-  const { type, otp } = req.body;
+// WebHook
 
-  const validateCharge = await axios.post(
-    `${FLW_BASE_URL}/validate-charge`,
-    {
-      type,
-      flw_ref,
-      otp,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
+export const webhook = async (payload: any) => {
+  try {
+    const myHash = process.env.MY_HASH;
+    const { headerHash, body } = payload;
+
+    if (!headerHash) return;
+    if (headerHash !== myHash) return;
+
+    const id = Number(body.data.customer.phone_number);
+    const t = await sequelizeConnection.transaction();
+
+    switch (body.event) {
+      case "charge.completed":
+        await creditAccount(
+          {
+            amount: body.data.amount,
+            account_id: Number(id),
+            txn_type: Txn_Type.credit,
+            purpose: "deposit",
+            reference: body.data.tx_ref,
+            metadata: { info: JSON.stringify(body) },
+          },
+          t
+        );
+        return;
+
+      default:
+        const accData = await accountDal.getById(id);
+
+        transactionDal.create({
+          txn_type: Txn_Type.credit,
+          purpose: "deposit",
+          amount: Number(body.data.amount),
+          account_id: Number(id),
+          reference: body.data.reference,
+          metadata: { info: JSON.stringify(body) },
+          balance_before: Number(accData.data.balance),
+          balance_after: Number(accData.data.balance),
+        });
+
+        return;
     }
-  );
-
-  const response = await validateCharge.data;
-
-  const transactionId = response.data.id;
-  const transaction = await axios.get(
-    `${FLW_BASE_URL}/transactions/${transactionId}/verify`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (transaction.data.status == "successful") {
-    return {
-      status: true,
-      message: "Charge validated",
-      data: {
-        id: transaction.data.id,
-        tx_ref: transaction.data.tx_ref,
-        amount: transaction.data.amount,
-      },
-    };
-  } else {
+  } catch (error) {
     return {
       status: false,
-      message: "Charge failed",
-      data: {},
+      message: "Something went wrong",
+      data: error,
     };
   }
 };

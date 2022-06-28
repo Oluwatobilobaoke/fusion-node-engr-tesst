@@ -63,7 +63,7 @@ const testDBConnect = async() => {
     await sequelizeConnection.authenticate();
     console.log(chalk.bgGreen('Connection to Database has been established successfully.'));
   } catch (error) {
-    console.error(chalk.bgRedBright('Unable to connect to the database:', error));
+    console.log(chalk.bgRedBright('Unable to connect to the database:', error));
   }
 };
 
