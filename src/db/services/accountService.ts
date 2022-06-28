@@ -134,7 +134,7 @@ export const transfer = async (sender_id: number, recipient_id: string, amount: 
   }
 }
 
-export const deposit =async (params:type) => {
+// export const deposit =async (params:type) => {
 
   
-}
+// }
