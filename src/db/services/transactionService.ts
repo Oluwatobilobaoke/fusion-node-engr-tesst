@@ -24,9 +24,7 @@ export const creditAccount = async (
 
   await increaseBalance(Number(account.id), Number(payload.amount));
 
-  console.log("HERE 1");
-
-  const trr = await transactionDal.create({
+  await transactionDal.create({
     txn_type: payload.txn_type,
     purpose: payload.purpose,
     amount: payload.amount,
@@ -37,8 +35,6 @@ export const creditAccount = async (
     balance_after: Number(account.balance) + Number(payload.amount),
   });
 
-  console.log(trr);
-  console.log("HERE 2");
   return {
     success: true,
     message: "Credit successful",
