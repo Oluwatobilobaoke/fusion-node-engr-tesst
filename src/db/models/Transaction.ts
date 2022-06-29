@@ -93,7 +93,7 @@ Transaction.init({
       allowNull: false,
     },
     metadata:{
-      type: DataTypes.JSON,
+      type: DataTypes.TEXT,
     }, 
     createdAt: {
       type: DataTypes.DATE,
