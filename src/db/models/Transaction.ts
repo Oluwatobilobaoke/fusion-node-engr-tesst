@@ -26,7 +26,7 @@ interface TransactionAttributes {
   reference: string;
   balance_before?: number;
   balance_after?: number;
-  metadata: TransactionMetadata | null;
+  metadata: string | null;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
@@ -53,7 +53,7 @@ class Transaction
   public reference!: string;
   public balance_before!: number;
   public balance_after!: number;
-  public metadata!: TransactionMetadata | null;
+  public metadata!: string | null;
 
   // timestamps!
   public readonly createdAt!: Date;
