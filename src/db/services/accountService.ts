@@ -55,8 +55,7 @@ export const transfer = async (
     };
   }
 
-  const checkUserBalance  = await accountDal.getByUserID(sender_id);
-
+  const checkUserBalance = await accountDal.getByUserID(sender_id);
 
   const userBal = checkUserBalance.data.balance;
   if (Number(userBal) <= amount) {
@@ -64,9 +63,8 @@ export const transfer = async (
       success: false,
       message: "Insufficient funds, Alaye Fund your account",
       data: {},
-    }
+    };
   }
-  
 
   const checkRecipientIsBen = await checkUserIsBeneficiary(
     sender_id,
@@ -95,9 +93,7 @@ export const transfer = async (
           txn_type: Txn_Type.debit,
           purpose: "transfer",
           reference,
-          metadata: {
-            info: String(recipient_id),
-          },
+          metadata: String(recipient_id),
         },
         t
       ),
@@ -108,9 +104,7 @@ export const transfer = async (
           txn_type: Txn_Type.credit,
           purpose: "transfer",
           reference,
-          metadata: {
-            info: String(sender_id),
-          },
+          metadata: String(sender_id),
         },
         t
       ),
