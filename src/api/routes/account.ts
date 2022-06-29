@@ -52,8 +52,6 @@ accountRouter.get("/verify-payment", async (req: Request, res: Response) => {
 });
 
 accountRouter.post("/webhook", async (req: Request, res: Response) => {
-  console.log(req);
-
   const hash = req.headers["verif-hash"];
   const body = req.body;
 
