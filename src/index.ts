@@ -4,11 +4,9 @@ import chalk from "chalk";
 import routes from "./api/routes";
 import dbInit from "./db/init";
 
-
-
 dbInit();
 
-const port = 5011;
+const port = process.env.PORT || 5011;
 
 export const get = () => {
   const app: Application = express();
