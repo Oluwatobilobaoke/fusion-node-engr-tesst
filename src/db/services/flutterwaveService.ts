@@ -105,7 +105,7 @@ export const verifyPayment = async (payload: VerifyPayload) => {
             txn_type: Txn_Type.credit,
             purpose: "deposit",
             reference: tx_ref,
-            metadata: { info: JSON.stringify(data) },
+            metadata: JSON.stringify(data),
           },
           t
         );
@@ -128,7 +128,7 @@ export const verifyPayment = async (payload: VerifyPayload) => {
           amount: Number(transactionDetails.data.amount),
           account_id: Number(id),
           reference: tx_ref,
-          metadata: { info: "Transaction Failed" },
+          metadata: JSON.stringify({ info: "Transaction Failed" }),
           balance_before: Number(accData.data.balance),
           balance_after: Number(accData.data.balance),
         });
@@ -170,7 +170,7 @@ export const webhook = async (payload: any) => {
             txn_type: Txn_Type.credit,
             purpose: "deposit",
             reference: body.data.tx_ref,
-            metadata: { info: JSON.stringify(body) },
+            metadata: JSON.stringify(body),
           },
           t
         );
@@ -179,13 +179,13 @@ export const webhook = async (payload: any) => {
       default:
         const accData = await accountDal.getById(id);
 
-        transactionDal.create({
+        await transactionDal.create({
           txn_type: Txn_Type.credit,
           purpose: "deposit",
           amount: Number(body.data.amount),
           account_id: Number(id),
           reference: body.data.reference,
-          metadata: { info: JSON.stringify(body) },
+          metadata: JSON.stringify(body),
           balance_before: Number(accData.data.balance),
           balance_after: Number(accData.data.balance),
         });
