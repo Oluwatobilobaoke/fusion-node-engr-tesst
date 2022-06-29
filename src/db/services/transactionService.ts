@@ -24,7 +24,7 @@ export const creditAccount = async (
 
   await increaseBalance(Number(account.id), Number(payload.amount));
 
-  await transactionDal.create({
+  const trr = await transactionDal.create({
     txn_type: payload.txn_type,
     purpose: payload.purpose,
     amount: payload.amount,
@@ -34,6 +34,8 @@ export const creditAccount = async (
     balance_before: Number(account.balance),
     balance_after: Number(account.balance) + Number(payload.amount),
   });
+
+  console.log(trr);
 
   return {
     success: true,
